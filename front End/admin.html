@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - College Attendance System</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Admin Dashboard - compact layout (scoped to this page only) */
+        .admin-dashboard {
+            max-width: 480px;
+            margin: 30px auto 50px;
+            padding: 0 16px;
+            text-align: center;
+        }
+
+        .admin-user {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 20px;
+        }
+
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            justify-items: center;
+        }
+
+        .admin-dashboard .admin-btn {
+            width: 100%;
+            max-width: 190px;
+            min-height: 44px;
+            height: auto;
+            padding: 6px 10px;
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.2;
+            text-align: center;
+            white-space: normal;
+            border-radius: 10px;
+            background: #2563eb;
+            color: #ffffff;
+            transition: background-color 0.2s ease, transform 0.15s ease;
+        }
+
+        .admin-dashboard .admin-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .admin-dashboard .admin-btn-logout {
+            max-width: 190px;
+            background: #dc2626;
+        }
+
+        .admin-dashboard .admin-btn-logout:hover {
+            background: #b91c1c;
+        }
+
+        .admin-logout {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        @media (max-width: 480px) {
+            .admin-dashboard {
+                margin: 20px auto 35px;
+                padding: 0 12px;
+            }
+
+            .admin-actions {
+                gap: 8px;
+            }
+
+            .admin-dashboard .admin-btn {
+                max-width: none;
+                min-height: 42px;
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+
+            .admin-dashboard .admin-btn-logout {
+                max-width: none;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-logo-left">
+            <img src="logo.png" alt="Thanthai Hans Roever College Logo" onerror="this.style.visibility='hidden'">
+        </div>
+       <div class="header-college-info">
+            <p class="header-college-name">THANTHAI HANS ROEVER COLLEGE (AUTONOMOUS)</p>
+            <p class="header-college-affiliation">(Affiliated to Bharathidasan University)</p>
+            <p class="header-college-accreditation">Accredited with ‘A’Grade by NAAC (3rd cycle) with CGPA 3.23 out of 4</p>
+            <p class="header-college-address">ELAMBALUR (P.O), PERAMBALUR – 621 220</p>
+            <h2 class="header-system-title">Attendance Maintenance System</h2>
+        </div>
+        <div class="header-logo-right">
+            <img src="img/Hans.png" alt="Thanthai Hans Roever College" onerror="this.style.visibility='hidden'">
+        </div>
+    </header>
+    <main class="main-content">
+
+    <div class="container admin-dashboard">
+
+        <h2 id="userInfo" class="admin-user"></h2>
+
+        <div class="admin-actions">
+            <button onclick="location.href='admin-student-requests.html'" id="btnStudentRequests" class="admin-btn">
+                Student Registration Requests <span id="pendingBadge" style="display:none; background:#ef4444; color:white; border-radius:10px; padding:2px 8px; margin-left:6px; font-size:11px;">0 Pending</span>
+            </button>
+            <button onclick="location.href='excelupload.html'" class="admin-btn">Upload Students</button>
+
+            <button onclick="location.href='studentsdata.html'" class="admin-btn">Students Data</button>
+            <button onclick="location.href='dailyreport.html'" class="admin-btn">Daily Report</button>
+            <button onclick="location.href='report.html'" class="admin-btn">Detailed Report</button> 
+           </div>
+
+        <div class="admin-logout">
+            <button class="admin-btn admin-btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+    </div>
+
+    <script src="admin.js"></script>
+
+    </main>
+</body>
+
+</html>

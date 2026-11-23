@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Settings - College Attendance System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ─── SMS Settings page – scoped styles ─────────────────────── */
+        .sms-settings-wrap {
+            max-width: 680px;
+            margin: 28px auto 60px;
+            padding: 0 16px;
+        }
+
+        .sms-page-title {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 20px;
+        }
+
+        .sms-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .sms-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-label {
+            font-size: 13px;
+            color: #374151;
+            font-weight: 500;
+            min-width: 110px;
+        }
+
+        .status-value {
+            font-size: 13px;
+            color: #374151;
+            word-break: break-all;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .badge-online  { background: #dcfce7; color: #15803d; }
+        .badge-offline { background: #fee2e2; color: #b91c1c; }
+        .badge-unknown { background: #f3f4f6; color: #6b7280; }
+
+        .counts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .count-box {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .count-box .num {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.1;
+        }
+
+        .count-box .lbl {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .count-box.sent     .num { color: #15803d; }
+        .count-box.failed   .num { color: #b91c1c; }
+        .count-box.pending  .num { color: #d97706; }
+        .count-box.skipped  .num { color: #6b7280; }
+
+        /* Test SMS form */
+        .sms-form-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sms-form-row input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+            padding: 9px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .sms-form-row input[type="text"]:focus {
+            border-color: #2563eb;
+        }
+
+        .sms-btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .sms-btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .sms-btn-primary:hover:not(:disabled) { background: #1d4ed8; transform: translateY(-1px); }
+        .sms-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .sms-btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .sms-btn-secondary:hover { background: #d1d5db; }
+
+        .sms-msg {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #374151;
+            min-height: 18px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #f1f5f9;
+        }
+
+        .sms-msg.success { background: #dcfce7; color: #166534; }
+        .sms-msg.error   { background: #fee2e2; color: #991b1b; }
+
+        .back-btn-row {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            background: #374151;
+            color: #fff;
+            padding: 9px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .back-link:hover { background: #1f2937; }
+
+        /* Notification history table */
+        .notif-table-wrap {
+            overflow-x: auto;
+            margin-top: 8px;
+        }
+
+        .notif-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+
+        .notif-table th {
+            background: #f1f5f9;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .notif-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #374151;
+            vertical-align: top;
+        }
+
+        .notif-table tr:last-child td { border-bottom: none; }
+
+        .status-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .pill-sent      { background: #dcfce7; color: #15803d; }
+        .pill-failed    { background: #fee2e2; color: #b91c1c; }
+        .pill-pending   { background: #fef9c3; color: #92400e; }
+        .pill-skipped   { background: #f3f4f6; color: #6b7280; }
+        .pill-delivered { background: #dbeafe; color: #1d4ed8; }
+
+        .retry-btn {
+            padding: 3px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #2563eb;
+            color: #fff;
+            transition: background 0.2s;
+        }
+
+        .retry-btn:hover:not(:disabled) { background: #1d4ed8; }
+        .retry-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        /* Filter row */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: flex-end;
+        }
+
+        .filter-row label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 11.5px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .filter-row select,
+        .filter-row input[type="date"] {
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 12.5px;
+            outline: none;
+        }
+
+        .filter-row select:focus,
+        .filter-row input[type="date"]:focus { border-color: #2563eb; }
+
+        @media (max-width: 520px) {
+            .sms-settings-wrap { padding: 0 10px; }
+            .sms-card { padding: 16px 14px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-logo-left">
+            <img src="logo.png" alt="Thanthai Hans Roever College Logo" onerror="this.style.visibility='hidden'">
+        </div>
+        <div class="header-college-info">
+            <p class="header-college-name">THANTHAI HANS ROEVER COLLEGE (AUTONOMOUS)</p>
+            <p class="header-college-affiliation">(Affiliated to Bharathidasan University)</p>
+            <p class="header-college-accreditation">Accredited with 'A'Grade by NAAC (3rd cycle) with CGPA 3.23 out of 4</p>
+            <p class="header-college-address">ELAMBALUR (P.O), PERAMBALUR – 621 220</p>
+            <h2 class="header-system-title">Attendance Maintenance System</h2>
+        </div>
+        <div class="header-logo-right">
+            <img src="img/Hans.png" alt="Thanthai Hans Roever College" onerror="this.style.visibility='hidden'">
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="sms-settings-wrap">
+            <h2 class="sms-page-title">📱 SMS Gateway Settings</h2>
+
+            <!-- ── Gateway Status Card ─────────────────────────────── -->
+            <div class="sms-card">
+                <h3>Gateway Connection Status</h3>
+
+                <div class="status-row">
+                    <span class="status-label">Provider</span>
+                    <span class="status-value" id="smsProvider">Loading…</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Status</span>
+                    <span id="smsStatusBadge" class="badge badge-unknown">Checking…</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Gateway URL</span>
+                    <span class="status-value" id="smsGatewayUrl">—</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Last Check</span>
+                    <span class="status-value" id="smsLastCheck">—</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Detail</span>
+                    <span class="status-value" id="smsDetail">—</span>
+                </div>
+
+                <div style="margin-top:12px;">
+                    <button class="sms-btn sms-btn-primary" id="btnCheckStatus" onclick="loadSmsStatus()">
+                        🔄 Refresh Status
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── Notification Counts Card ───────────────────────── -->
+            <div class="sms-card">
+                <h3>Notification Summary</h3>
+                <div class="counts-grid" id="notifCounts">
+                    <div class="count-box sent"><div class="num" id="cntSent">—</div><div class="lbl">Sent</div></div>
+                    <div class="count-box failed"><div class="num" id="cntFailed">—</div><div class="lbl">Failed</div></div>
+                    <div class="count-box pending"><div class="num" id="cntPending">—</div><div class="lbl">Pending</div></div>
+                    <div class="count-box skipped"><div class="num" id="cntSkipped">—</div><div class="lbl">Skipped</div></div>
+                    <div class="count-box"><div class="num" id="cntDelivered">—</div><div class="lbl">Delivered</div></div>
+                </div>
+            </div>
+
+            <!-- ── Test SMS Card ──────────────────────────────────── -->
+            <div class="sms-card">
+                <h3>Send Test SMS</h3>
+                <p style="font-size:13px;color:#6b7280;margin:0 0 6px;">
+                    Enter a 10-digit Indian mobile number to verify gateway connectivity.
+                    Credentials are never sent to the browser.
+                </p>
+                <div class="sms-form-row">
+                    <input type="text" id="testPhoneNumber" placeholder="e.g. 9876543210" maxlength="15">
+                    <button class="sms-btn sms-btn-primary" id="btnTestSms" onclick="sendTestSms()">
+                        📤 Send Test SMS
+                    </button>
+                </div>
+                <div class="sms-msg" id="testSmsMsg" style="display:none;"></div>
+            </div>
+
+            <!-- ── Notification History Card ─────────────────────── -->
+            <div class="sms-card">
+                <h3>Parent Notification History</h3>
+
+                <div class="filter-row">
+                    <label>From
+                        <input type="date" id="hDateFrom">
+                    </label>
+                    <label>To
+                        <input type="date" id="hDateTo">
+                    </label>
+                    <label>Class
+                        <select id="hClass">
+                            <option value="">All Classes</option>
+                            <option value="CS1">CS1 (UG Year 1)</option>
+                            <option value="CS2">CS2 (UG Year 2)</option>
+                            <option value="CS3">CS3 (UG Year 3)</option>
+                            <option value="PGCS1">PGCS1 (PG Year 1)</option>
+                            <option value="PGCS2">PGCS2 (PG Year 2)</option>
+                        </select>
+                    </label>
+                    <label>Status
+                        <select id="hStatus">
+                            <option value="">All Statuses</option>
+                            <option value="sent">Sent</option>
+                            <option value="failed">Failed</option>
+                            <option value="pending">Pending</option>
+                            <option value="skipped">Skipped</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                    </label>
+                    <button class="sms-btn sms-btn-primary" onclick="loadHistory()" style="align-self:flex-end;padding:7px 16px;font-size:12.5px;">
+                        🔍 Filter
+                    </button>
+                </div>
+
+                <div class="sms-msg" id="historyMsg">Loading notification history…</div>
+
+                <div class="notif-table-wrap">
+                    <table class="notif-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Roll No</th>
+                                <th>Parent Phone</th>
+                                <th>Class</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Reason</th>
+                                <th>Attempts</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── Back button ────────────────────────────────────── -->
+            <div class="back-btn-row">
+                <a href="admin.html" class="back-link">← Back to Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    'use strict';
+
+    const BASE_URL = 'http://localhost:5000/api';
+
+    // ── Auth guard ──────────────────────────────────────────────────────────
+    function getAuthHeaders() {
+        const token = localStorage.getItem('token');
+        return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+    }
+
+    function checkAdmin() {
+        let user = null;
+        try { user = JSON.parse(localStorage.getItem('currentUser')); } catch {}
+        if (!user) { window.location.href = 'index.html'; return false; }
+        if (user.role !== 'admin') { alert('Access denied. Admin privileges required.'); window.location.href = 'home.html'; return false; }
+        return true;
+    }
+
+    // ── Status badge helper ─────────────────────────────────────────────────
+    function setStatusBadge(online, text) {
+        const badge = document.getElementById('smsStatusBadge');
+        badge.textContent = text;
+        badge.className = 'badge ' + (online === true ? 'badge-online' : online === false ? 'badge-offline' : 'badge-unknown');
+    }
+
+    // ── Load gateway status ─────────────────────────────────────────────────
+    async function loadSmsStatus() {
+        const btn = document.getElementById('btnCheckStatus');
+        btn.disabled = true;
+        btn.textContent = '⏳ Checking…';
+        setStatusBadge(null, 'Checking…');
+
+        try {
+            const res  = await fetch(`${BASE_URL}/notifications/sms-status`, { headers: getAuthHeaders() });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) throw new Error(data.message || 'Status check failed');
+
+            // Provider
+            const providerNames = { android_gateway: 'Android SMS Gateway', fast2sms: 'Fast2SMS', none: 'None configured' };
+            document.getElementById('smsProvider').textContent = providerNames[data.provider] || data.provider;
+
+            // Status badge
+            setStatusBadge(data.gatewayOnline, data.gatewayOnline ? '🟢 Online' : '🔴 Offline');
+
+            // URL (safe — not a credential)
+            document.getElementById('smsGatewayUrl').textContent = data.gatewayUrl || '—';
+
+            // Last check time
+            document.getElementById('smsLastCheck').textContent = new Date().toLocaleString('en-IN');
+
+            // Detail message
+            document.getElementById('smsDetail').textContent = data.gatewayDetail || '—';
+
+            // Counts
+            const c = data.counts || {};
+            document.getElementById('cntSent').textContent      = c.sent      ?? '—';
+            document.getElementById('cntFailed').textContent    = c.failed    ?? '—';
+            document.getElementById('cntPending').textContent   = c.pending   ?? '—';
+            document.getElementById('cntSkipped').textContent   = c.skipped   ?? '—';
+            document.getElementById('cntDelivered').textContent = c.delivered ?? '—';
+
+        } catch (err) {
+            setStatusBadge(false, '🔴 Error');
+            document.getElementById('smsDetail').textContent = err.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🔄 Refresh Status';
+        }
+    }
+
+    // ── Send test SMS ───────────────────────────────────────────────────────
+    async function sendTestSms() {
+        const msgEl  = document.getElementById('testSmsMsg');
+        const phoneEl = document.getElementById('testPhoneNumber');
+        const btn    = document.getElementById('btnTestSms');
+
+        const phone = phoneEl.value.trim();
+        if (!phone) {
+            showMsg(msgEl, 'Enter a phone number first.', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Sending…';
+        showMsg(msgEl, 'Sending test SMS…', '');
+
+        try {
+            const res  = await fetch(`${BASE_URL}/notifications/test-sms`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ phoneNumber: phone })
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) throw new Error(data.message || 'Test SMS failed');
+            showMsg(msgEl, `✅ ${data.message}${data.providerMessageId ? ` (ID: ${data.providerMessageId})` : ''}`, 'success');
+        } catch (err) {
+            showMsg(msgEl, `❌ ${err.message}`, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '📤 Send Test SMS';
+        }
+    }
+
+    function showMsg(el, text, type) {
+        el.textContent = text;
+        el.className = 'sms-msg' + (type ? ` ${type}` : '');
+        el.style.display = text ? 'block' : 'none';
+    }
+
+    // ── Notification history ────────────────────────────────────────────────
+    async function loadHistory() {
+        const msgEl  = document.getElementById('historyMsg');
+        const tbody  = document.getElementById('historyBody');
+        tbody.replaceChildren();
+        showMsg(msgEl, 'Loading…', '');
+
+        const params = new URLSearchParams();
+        const from   = document.getElementById('hDateFrom').value;
+        const to     = document.getElementById('hDateTo').value;
+        const cls    = document.getElementById('hClass').value;
+        const status = document.getElementById('hStatus').value;
+        if (from)   params.set('dateFrom', from);
+        if (to)     params.set('dateTo',   to);
+        if (cls)    params.set('classId',  cls);
+        if (status) params.set('status',   status);
+        // department is always Computer Science per API requirement
+        params.set('department', 'Computer Science');
+
+        try {
+            const res  = await fetch(`${BASE_URL}/notifications?${params}`, { headers: getAuthHeaders() });
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load history');
+
+            const list = data.notifications || [];
+            if (!list.length) {
+                showMsg(msgEl, 'No notification records match these filters.', '');
+                return;
+            }
+
+            list.forEach(n => {
+                const tr = document.createElement('tr');
+
+                td(tr, n.studentName || '—');
+                td(tr, n.studentId   || '—');
+                td(tr, n.parentPhoneMasked || '—');
+                td(tr, n.classId    || '—');
+                td(tr, n.attendanceDate || '—');
+
+                // Status pill
+                const statusTd = document.createElement('td');
+                const pill = document.createElement('span');
+                pill.className = `status-pill pill-${n.status || 'unknown'}`;
+                pill.textContent = n.status || '—';
+                statusTd.appendChild(pill);
+                tr.appendChild(statusTd);
+
+                td(tr, n.failureReason || '—');
+                td(tr, n.attempts !== undefined ? n.attempts : '—');
+
+                // Action cell
+                const actionTd = document.createElement('td');
+                if (n.canRetry) {
+                    const btn = document.createElement('button');
+                    btn.className  = 'retry-btn';
+                    btn.textContent = 'Retry';
+                    btn.addEventListener('click', () => retryNotification(n._id, btn));
+                    actionTd.appendChild(btn);
+                } else {
+                    actionTd.textContent = '—';
+                }
+                tr.appendChild(actionTd);
+                tbody.appendChild(tr);
+            });
+
+            showMsg(msgEl, `Showing ${list.length} record(s).`, '');
+        } catch (err) {
+            showMsg(msgEl, `❌ ${err.message}`, 'error');
+        }
+    }
+
+    function td(tr, text) {
+        const cell = document.createElement('td');
+        cell.textContent = (text === null || text === undefined) ? '—' : String(text);
+        tr.appendChild(cell);
+        return cell;
+    }
+
+    async function retryNotification(id, btn) {
+        const msgEl = document.getElementById('historyMsg');
+        btn.disabled = true;
+        btn.textContent = '⏳';
+
+        try {
+            const res  = await fetch(`${BASE_URL}/notifications/${encodeURIComponent(id)}/retry`, {
+                method: 'POST',
+                headers: getAuthHeaders()
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                showMsg(msgEl, `❌ Retry: ${data.message || 'Failed'}`, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Retry';
+                return;
+            }
+
+            showMsg(msgEl, `✅ ${data.message}`, 'success');
+            await loadHistory();      // refresh the table
+            await loadSmsStatus();    // refresh counts
+        } catch (err) {
+            showMsg(msgEl, `❌ ${err.message}`, 'error');
+            btn.disabled = false;
+            btn.textContent = 'Retry';
+        }
+    }
+
+    // ── Init ────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!checkAdmin()) return;
+        loadSmsStatus();
+        loadHistory();
+    });
+    </script>
+</body>
+
+</html>

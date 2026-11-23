@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Roster</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-logo-left">
+            <img src="logo.png" alt="Thanthai Hans Roever College Logo" onerror="this.style.visibility='hidden'">
+        </div>
+      <div class="header-college-info">
+            <p class="header-college-name">THANTHAI HANS ROEVER COLLEGE (AUTONOMOUS)</p>
+            <p class="header-college-affiliation">(Affiliated to Bharathidasan University)</p>
+            <p class="header-college-accreditation">Accredited with ‘A’Grade by NAAC (3rd cycle) with CGPA 3.23 out of 4</p>
+            <p class="header-college-address">ELAMBALUR (P.O), PERAMBALUR – 621 220</p>
+            <h2 class="header-system-title">Attendance Maintenance System</h2>
+        </div>
+        <div class="header-logo-right">
+            <img src="img/Hans.png" alt="Thanthai Hans Roever College" onerror="this.style.visibility='hidden'">
+        </div>
+    </header>
+    <main class="main-content">
+
+    <div class="container" style="max-width: 900px; margin: 30px auto; padding: 20px; color: #ffffff;">
+        <h3 class="center" style="margin-bottom: 5px;">Daily Attendance</h3>
+        <div id="classBanner" class="center" style="margin-bottom: 15px; font-size: 16px; font-weight: 600; color: #e2e8f0;"></div>
+
+        <div class="center" style="margin-bottom: 15px;">
+            <label for="attendanceDate" style="margin-right: 8px; font-weight: 600;">Date:</label>
+            <input type="date" id="attendanceDate" onchange="renderAttendance()" disabled title="Date fixed for staff - only admin can change dates">
+
+            <!-- Period selector – new 5-period support -->
+            <span style="margin-left: 20px; margin-right: 8px; font-weight: 600;">Period:</span>
+            <select id="attendancePeriod" onchange="renderAttendance()" style="padding: 6px 12px; font-size: 15px; border-radius: 6px; border: none; background: rgba(255,255,255,0.15); color: #ffffff; cursor: pointer; font-weight: 600;">
+                <option value="1">HOUR 1</option>
+                <option value="2">HOUR 2</option>
+                <option value="3">HOUR 3</option>
+                <option value="4">HOUR 4</option>
+                <option value="5">HOUR 5</option>
+            </select>
+
+            <div id="attendanceStats"></div>
+            <!-- Shows which periods have already been submitted for the selected date -->
+            <div id="periodStatusBar" style="margin-top: 10px; font-size: 13px; color: #cbd5e1;"></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Serial</th>
+                    <th style="width: 25%;">Register No</th>
+                    <th style="width: 40%;">Name</th>
+                    <th style="width: 25%;">Status</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceBody">
+                <tr>
+                    <td colspan="4" style="padding: 20px;">Loading student list...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="center" style="margin-top: 25px;">
+            <button onclick="submitAttendance()" id="btnSubmitAttendance" style="padding: 10px 28px; font-size: 15px; font-weight: 600;">Submit Attendance</button>
+            <br><br>
+            <button class="red" onclick="location.href='home.html'" style="padding: 8px 22px;">Back to Home</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    </main>
+</body>
+
+</html>

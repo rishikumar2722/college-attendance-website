@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanthai Hans Roever College - Attendance System Login</title>
+    <link rel="stylesheet" href="style.css?v=20261101">
+   
+</head>
+
+<body>
+    <!-- Navbar Header with adjusted size and centered college details -->
+    <header class="header">
+        <div class="header-logo-left">
+            <img src="logo.png" alt="Thanthai Hans Roever College Logo" onerror="this.style.visibility='hidden'">
+        </div>
+        <div class="header-college-info">
+            <p class="header-college-name">THANTHAI HANS ROEVER COLLEGE (AUTONOMOUS)</p>
+            <p class="header-college-affiliation">(Affiliated to Bharathidasan University)</p>
+            <p class="header-college-accreditation">Accredited with ‘A’Grade by NAAC (3rd cycle) with CGPA 3.23 out of 4</p>
+            <p class="header-college-address">ELAMBALUR (P.O), PERAMBALUR – 621 220</p>
+            <h2 class="header-system-title">Attendance Maintenance System</h2>
+        </div>
+        <div class="header-logo-right">
+            <img src="img/Hans.png" alt="Thanthai Hans Roever College" onerror="this.style.visibility='hidden'">
+        </div>
+    </header>
+    <main class="main-content">
+<center>
+    <!-- Login Area -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-fields" style="margin-top: 10%;">
+                <input id="loginUser" placeholder="Username" autocomplete="username" autofocus>
+                <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+            </div>
+            <button class="btn-login" onclick="login()">Login</button>
+            <div id="loginMsg"></div>
+        </div>
+    </div>
+</center>
+    <script src="script.js?v=20261030"></script>
+    </main>
+</body>
+
+</html>

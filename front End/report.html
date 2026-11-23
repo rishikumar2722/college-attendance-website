@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed Attendance Report</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .detailed-report-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-info {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .filter-section {
+            background: none;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .filter-group select,
+        .filter-group input[type="date"] {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-group select option {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .filter-group input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-actions button {
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .btn-generate {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-students {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .btn-students:hover {
+            background-color: #5a2d91;
+        }
+
+        .btn-excel {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-excel:hover {
+            background-color: #1e7e34;
+        }
+
+        .report-summary {
+            text-align: center;
+            color: white;
+            font-size: 16px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .detailed-report-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .detailed-report-table th {
+            background: transparent;
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+        }
+
+        .detailed-report-table td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .detailed-report-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .student-name-cell {
+            text-align: left !important;
+            font-weight: 500;
+        }
+
+        .register-cell {
+            font-family: monospace;
+            font-weight: 500;
+        }
+
+        .percentage-cell {
+            font-weight: bold;
+        }
+
+        .percentage-high {
+            color: #4caf50 !important;
+        }
+
+        .percentage-medium {
+            color: #ffeb3b !important;
+        }
+
+        .percentage-low {
+            color: #ff6b6b !important;
+        }
+
+        .present-count {
+            color: #4caf50;
+            font-weight: 600;
+        }
+
+        .absent-count {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .no-data-row {
+            color: #b3b3b3 !important;
+            font-style: italic;
+        }
+
+        .back-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .back-btn {
+            padding: 12px 24px;
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .message-area {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .loading-message {
+            color: #67e8f9;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+        }
+
+        .success-message {
+            color: #4caf50;
+        }
+
+        .warning-message {
+            color: #ffeb3b;
+        }
+
+        @media (max-width: 768px) {
+            .filter-section {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .filter-actions {
+                justify-content: center;
+            }
+            
+            .detailed-report-table {
+                font-size: 12px;
+            }
+            
+            .detailed-report-table th,
+            .detailed-report-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-logo-left">
+            <img src="logo.png" alt="Thanthai Hans Roever College Logo" onerror="this.style.visibility='hidden'">
+        </div>
+       <div class="header-college-info">
+            <p class="header-college-name">THANTHAI HANS ROEVER COLLEGE (AUTONOMOUS)</p>
+            <p class="header-college-affiliation">(Affiliated to Bharathidasan University)</p>
+            <p class="header-college-accreditation">Accredited with ‘A’Grade by NAAC (3rd cycle) with CGPA 3.23 out of 4</p>
+            <p class="header-college-address">ELAMBALUR (P.O), PERAMBALUR – 621 220</p>
+            <h2 class="header-system-title">Attendance Maintenance System</h2>
+        </div>
+        <div class="header-logo-right">
+            <img src="img/Hans.png" alt="Thanthai Hans Roever College" onerror="this.style.visibility='hidden'">
+        </div>
+    </header>
+    <main class="main-content">
+
+    <div class="detailed-report-container">
+        <div id="userInfo" class="user-info"></div>
+        <h1 class="page-title">Detailed Attendance Report</h1>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="reportDepartment">Department:</label>
+                <select id="reportDepartment" required>
+                    <option value="" disabled selected>Select Department</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="English">English</option>
+                </select>
+            </div>
+
+            <div class="filter-group" id="filterProgramGroup">
+                <label for="reportProgram">Program:</label>
+                <select id="reportProgram" onchange="onProgramChange()">
+                    <option value="UG" selected>UG (Undergraduate)</option>
+                    <option value="PG">PG (Postgraduate)</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="reportYear">Year:</label>
+                <select id="reportYear" required>
+                    <option value="" disabled selected>Select Year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="fromDate">From Date:</label>
+                <input type="date" id="fromDate">
+            </div>
+
+            <div class="filter-group">
+                <label for="toDate">To Date:</label>
+                <input type="date" id="toDate">
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-actions">
+                    <button class="btn-generate" onclick="generateReport()">Generate Report</button>
+                    <button class="btn-students" onclick="viewStudentData()" title="View enrolled students for this class">Student List</button>
+                    <button class="btn-excel" onclick="downloadReport()">Download PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Summary -->
+        <div id="reportSummary" class="report-summary" style="display: none;"></div>
+
+        <!-- Report Table -->
+        <table class="detailed-report-table" id="reportTable" style="display: none;">
+            <thead id="reportHead">
+                <tr>
+                    <th>Serial</th>
+                    <th>Register No</th>
+                    <th>Name</th>
+                    <th>Total Days</th>
+                    <th>Sessions</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>%</th>
+                </tr>
+            </thead>
+            <tbody id="reportBody"></tbody>
+        </table>
+
+        <!-- Message Area -->
+        <div id="messageArea" class="message-area" style="display: none;"></div>
+
+        <!-- Back Button -->
+        <div class="back-section">
+            <button class="back-btn" onclick="goBack()">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Report page — all data fetched from backend API via apiFetch()
+        let currentReportType = 'attendance'; // 'attendance' or 'students'
+        let currentUser = null;
+
+        function onProgramChange() {
+            const progEl = document.getElementById("reportProgram");
+            const yearEl = document.getElementById("reportYear");
+            if (!progEl || !yearEl) return;
+
+            const selectedProg = progEl.value;
+            const currentYear = yearEl.value;
+            yearEl.innerHTML = '<option value="" disabled selected>Select Year</option>';
+
+            if (selectedProg === 'PG') {
+                yearEl.innerHTML += `
+                    <option value="1">1st Year (PGCS1)</option>
+                    <option value="2">2nd Year (PGCS2)</option>
+                `;
+                if (currentYear === '1' || currentYear === '2') {
+                    yearEl.value = currentYear;
+                }
+            } else {
+                yearEl.innerHTML += `
+                    <option value="1">1st Year (CS1)</option>
+                    <option value="2">2nd Year (CS2)</option>
+                    <option value="3">3rd Year (CS3)</option>
+                `;
+                if (['1', '2', '3'].includes(currentYear)) {
+                    yearEl.value = currentYear;
+                }
+            }
+        }
+
+        /* ── Init ─────────────────────────────────────────────────────── */
+        function initDetailedReport() {
+            currentUser = getCurrentUser();
+
+            if (!currentUser) {
+                alert("Please login first.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            // Display user info
+            const userInfoEl = document.getElementById("userInfo");
+            if (userInfoEl) {
+                if (currentUser.role === 'admin') {
+                    userInfoEl.innerHTML = '<strong>Administrator</strong>';
+                } else {
+                    userInfoEl.innerHTML = `Welcome, <strong>${currentUser.name || currentUser.username}</strong> | Role: <strong>Staff</strong>`;
+                }
+            }
+
+            // Lock dropdowns for staff
+            if (currentUser.role === 'staff') {
+                const deptEl = document.getElementById("reportDepartment");
+                const progEl = document.getElementById("reportProgram");
+                const yearEl = document.getElementById("reportYear");
+
+                const staffProgram = currentUser.program || (currentUser.classId && currentUser.classId.startsWith('PG') ? 'PG' : 'UG');
+
+                if (deptEl && currentUser.department) {
+                    deptEl.value = currentUser.department;
+                    deptEl.disabled = true;
+                }
+                if (progEl) {
+                    progEl.value = staffProgram;
+                    progEl.disabled = true;
+                }
+                onProgramChange();
+                if (yearEl && currentUser.year && currentUser.year !== 'All') {
+                    yearEl.value = String(currentUser.year);
+                    yearEl.disabled = true;
+                }
+            } else {
+                onProgramChange();
+            }
+
+            // Default date range: last 30 days
+            const today = new Date();
+            const lastMonth = new Date();
+            lastMonth.setDate(today.getDate() - 30);
+            const fromDateEl = document.getElementById("fromDate");
+            const toDateEl   = document.getElementById("toDate");
+            if (fromDateEl) fromDateEl.value = lastMonth.toISOString().split('T')[0];
+            if (toDateEl)   toDateEl.value   = today.toISOString().split('T')[0];
+        }
+
+        /* ── Helpers ──────────────────────────────────────────────────── */
+        function showElement(id) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = "block";
+        }
+        function hideElement(id) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = "none";
+        }
+        function showMessage(message, type = 'info') {
+            const el = document.getElementById("messageArea");
+            if (el) {
+                el.className = `message-area ${type}-message`;
+                el.innerHTML = message;
+                el.style.display = "block";
+            }
+        }
+        function clearMessage() { hideElement("messageArea"); }
+
+        /* ── Generate Attendance Report (API) ─────────────────────────── */
+        async function generateReport() {
+            const deptEl = document.getElementById("reportDepartment");
+            const progEl = document.getElementById("reportProgram");
+            const yearEl = document.getElementById("reportYear");
+            const fromEl = document.getElementById("fromDate");
+            const toEl   = document.getElementById("toDate");
+
+            const department = deptEl ? deptEl.value.trim() : "";
+            const program    = progEl ? progEl.value.trim() : "UG";
+            const year       = yearEl ? yearEl.value.trim() : "";
+            const fromDate   = fromEl ? fromEl.value : "";
+            const toDate     = toEl   ? toEl.value   : "";
+
+            if (!department) { alert("Please select a Department."); if (deptEl) deptEl.focus(); return; }
+            if (!year)       { alert("Please select a Year.");       if (yearEl) yearEl.focus(); return; }
+            if (!fromDate)   { alert("Please select From date.");    if (fromEl) fromEl.focus(); return; }
+            if (!toDate)     { alert("Please select To date.");      if (toEl)   toEl.focus();   return; }
+            if (fromDate > toDate) { alert("From date cannot be after To date."); return; }
+
+            currentReportType = 'attendance';
+            clearMessage();
+            showMessage("⏳ Generating attendance report from database...", "loading");
+            hideElement("reportTable");
+            hideElement("reportSummary");
+
+            // Set attendance table header (period-aware)
+            const thead = document.getElementById("reportHead");
+            if (thead) {
+                thead.innerHTML = `
+                    <tr>
+                        <th>Serial</th>
+                        <th>Register No</th>
+                        <th>Name</th>
+                        <th>Total Days</th>
+                        <th>Sessions</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>%</th>
+                    </tr>`;
+            }
+
+            const res = await apiFetch(
+                `/reports/attendance?department=${encodeURIComponent(department)}&program=${encodeURIComponent(program)}&year=${encodeURIComponent(year)}&from=${encodeURIComponent(fromDate)}&to=${encodeURIComponent(toDate)}`
+            );
+
+            if (!res.ok) {
+                showMessage(`❌ ${res.message || 'Failed to load report from server.'}`, "error");
+                return;
+            }
+
+            const report = res.report || [];
+            const tbody  = document.getElementById("reportBody");
+            const summaryEl = document.getElementById("reportSummary");
+
+            if (report.length === 0) {
+                showMessage(`⚠️ No student records found for ${department} (${program} Year ${year}). Please upload students or record attendance first.`, "warning");
+                return;
+            }
+
+            // Summary
+            if (summaryEl) {
+                const sfx = year === '1' ? 'st' : year === '2' ? 'nd' : year === '3' ? 'rd' : 'th';
+                const classLabel = program === 'PG' ? `PGCS${year}` : `CS${year}`;
+                const sessionLabel = res.hasPeriodRecords
+                    ? `Period Sessions: ${res.totalPeriodSessions}`
+                    : `Recorded Days: ${res.totalRecordedDays}`;
+                summaryEl.innerHTML = `
+                    <strong>Detailed Report:</strong> ${department} - ${program} ${year}${sfx} Year (${classLabel}) &nbsp;|&nbsp;
+                    <strong>Date Range:</strong> ${fromDate} to ${toDate} &nbsp;|&nbsp;
+                    <strong>Students:</strong> ${res.totalStudents} &nbsp;|&nbsp;
+                    <strong>${sessionLabel}</strong>
+                    ${res.hasPeriodRecords ? ' &nbsp;|&nbsp; <span style="color:#4ade80;">5-Period Mode ✓</span>' : ''}
+                `;
+                showElement("reportSummary");
+            }
+
+            // Table rows
+            tbody.innerHTML = "";
+            report.forEach(item => {
+                const badgeColor = item.percentage >= 75 ? "#4ade80"
+                                 : item.percentage >= 50 ? "#facc15"
+                                 : "#f87171";
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.serial}</td>
+                    <td class="register-cell">${item.studentId}</td>
+                    <td class="student-name-cell">${item.studentName}</td>
+                    <td>${item.totalDays}</td>
+                    <td>${item.totalSubmitted || item.totalDays}</td>
+                    <td class="present-count">${item.present}</td>
+                    <td class="absent-count">${item.absent}</td>
+                    <td style="font-weight:bold;color:${badgeColor};">${item.percentage}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            showElement("reportTable");
+            clearMessage();
+            const msg = res.totalRecordedDays === 0
+                ? "⚠️ No attendance has been recorded for this class in the selected date range."
+                : `✅ Report generated! ${report.length} students · ${res.totalRecordedDays} recorded days.`;
+            showMessage(msg, res.totalRecordedDays === 0 ? "warning" : "success");
+        }
+
+        /* ── View Student List (API) ───────────────────────────────────── */
+        async function viewStudentData() {
+            const deptEl = document.getElementById("reportDepartment");
+            const progEl = document.getElementById("reportProgram");
+            const yearEl = document.getElementById("reportYear");
+
+            const department = deptEl ? deptEl.value.trim() : "";
+            const program    = progEl ? progEl.value.trim() : "UG";
+            const year       = yearEl ? yearEl.value.trim() : "";
+
+            if (!department) { alert("Please select a Department."); if (deptEl) deptEl.focus(); return; }
+            if (!year)       { alert("Please select a Year.");       if (yearEl) yearEl.focus(); return; }
+
+            currentReportType = 'students';
+            clearMessage();
+            showMessage("⏳ Loading student list from database...", "loading");
+            hideElement("reportTable");
+            hideElement("reportSummary");
+
+            const isAdmin = currentUser && currentUser.role === 'admin';
+
+            // Set student-list table header
+            const thead = document.getElementById("reportHead");
+            if (thead) {
+                thead.innerHTML = `
+                    <tr>
+                        <th>Serial</th>
+                        <th>Register No</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Program</th>
+                        <th>Year</th>
+                        ${isAdmin ? '<th>Action</th>' : ''}
+                    </tr>`;
+            }
+
+            const res = await apiFetch(
+                `/reports/students?department=${encodeURIComponent(department)}&program=${encodeURIComponent(program)}&year=${encodeURIComponent(year)}`
+            );
+
+            if (!res.ok) {
+                showMessage(`❌ ${res.message || 'Failed to load students from server.'}`, "error");
+                return;
+            }
+
+            const students = res.students || [];
+            const tbody    = document.getElementById("reportBody");
+            const summaryEl = document.getElementById("reportSummary");
+
+            if (students.length === 0) {
+                if (summaryEl) {
+                    summaryEl.innerHTML = `<span class="warning-message">⚠️ No students found for ${department} - ${program} Year ${year}.</span>`;
+                    showElement("reportSummary");
+                }
+                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 7 : 6}" style="text-align:center;padding:25px;">No students found. Please upload students first.</td></tr>`;
+                showElement("reportTable");
+                clearMessage();
+                return;
+            }
+
+            // Summary
+            if (summaryEl) {
+                const sfx = year === '1' ? 'st' : year === '2' ? 'nd' : year === '3' ? 'rd' : 'th';
+                const classLabel = program === 'PG' ? `PGCS${year}` : `CS${year}`;
+                summaryEl.innerHTML = `
+                    <strong>Enrolled Students:</strong> ${department} - ${program} ${year}${sfx} Year (${classLabel}) &nbsp;|&nbsp;
+                    <strong>Total:</strong> ${students.length}
+                `;
+                showElement("reportSummary");
+            }
+
+            // Table rows
+            tbody.innerHTML = "";
+            students.forEach((s, idx) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${s.serial || idx + 1}</td>
+                    <td class="register-cell">${s.studentId}</td>
+                    <td class="student-name-cell">${s.studentName}</td>
+                    <td>${s.department}</td>
+                    <td><strong>${s.program || program}</strong></td>
+                    <td>Year ${s.year}</td>
+                    ${isAdmin ? `<td><button class="back-btn" style="padding:4px 12px;font-size:12px;" onclick="deleteStudent('${s._id || s.studentId}','${(s.studentName||'').replace(/'/g,"\\'")}')">Delete</button></td>` : ''}
+                `;
+                tbody.appendChild(row);
+            });
+
+            showElement("reportTable");
+            clearMessage();
+            showMessage(`✅ Loaded ${students.length} students.`, "success");
+        }
+
+        /* ── Delete student (API, admin only) ─────────────────────────── */
+        async function deleteStudent(studentId, studentName) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert("Only administrators can delete student records.");
+                return;
+            }
+            if (!confirm(`Permanently delete ${studentName} (${studentId})?`)) return;
+
+            const res = await apiFetch(`/students/${encodeURIComponent(studentId)}`, { method: 'DELETE' });
+            if (res.ok) {
+                showMessage(`✅ ${res.message || 'Student deleted.'}`, "success");
+                viewStudentData(); // refresh list
+            } else {
+                showMessage(`❌ Delete failed: ${res.message}`, "error");
+            }
+        }
+        /* ── Download PDF ─────────────────────────────────────────────── */
+        async function downloadReport() {
+            const deptEl = document.getElementById("reportDepartment");
+            const progEl = document.getElementById("reportProgram");
+            const yearEl = document.getElementById("reportYear");
+            const department = deptEl ? deptEl.value.trim() : "";
+            const program    = progEl ? progEl.value.trim() : "UG";
+            const year       = yearEl ? yearEl.value.trim() : "";
+
+            if (!department || !year) {
+                alert("Please select Department and Year first.");
+                return;
+            }
+
+            const tbody = document.getElementById("reportBody");
+            if (!tbody || tbody.children.length === 0
+                || tbody.innerText.includes("No students found")
+                || tbody.innerText.includes("No attendance records")) {
+                alert("No data to download. Please generate a report or view the student list first.");
+                return;
+            }
+
+            try {
+                if (typeof window.jspdf === 'undefined') {
+                    alert("PDF library not loaded. Please refresh and try again.");
+                    return;
+                }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const isAdminPdf = currentUser && currentUser.role === 'admin';
+                const hasCollegeHeader = isAdminPdf || currentReportType === 'attendance';
+                const reportHeaderOffset = hasCollegeHeader ? 28 : 0;
+                if (hasCollegeHeader) {
+                    await addCollegePdfHeader(doc);
+                }
+
+                const thead = document.getElementById("reportHead");
+                const headers = [];
+                thead.querySelectorAll('th').forEach(th => {
+                    if (th.textContent.trim() !== 'Action') headers.push(th.textContent.trim());
+                });
+
+                const tableData = [];
+                tbody.querySelectorAll('tr').forEach(tr => {
+                    const row = [];
+                    tr.querySelectorAll('td').forEach(td => {
+                        if (!td.querySelector('button')) row.push(td.textContent.trim());
+                    });
+                    if (row.length > 0) tableData.push(row);
+                });
+
+                const sfx = year === '1' ? 'st' : year === '2' ? 'nd' : year === '3' ? 'rd' : 'th';
+                const classLabel = program === 'PG' ? `PGCS${year}` : `CS${year}`;
+                const timestamp = new Date().toISOString().split('T')[0];
+                let filename, title, subtitle;
+
+                if (currentReportType === 'students') {
+                    filename = `Student_List_${department.replace(/\s+/g,'_')}_${program}_Year_${year}_${timestamp}.pdf`;
+                    title    = 'Student List Report';
+                    subtitle = `${department} - ${program} ${year}${sfx} Year (${classLabel})`;
+                    doc.setFontSize(18); doc.setFont(undefined,'bold'); doc.text(title, 14, 15 + reportHeaderOffset);
+                    doc.setFontSize(12); doc.setFont(undefined,'normal');
+                    doc.text(subtitle, 14, 25 + reportHeaderOffset);
+                    doc.text(`Total Students: ${tableData.length}`, 14, 32 + reportHeaderOffset);
+                    doc.autoTable({ startY:40 + reportHeaderOffset, head:[headers], body:tableData, theme:'grid',
+                        headStyles:{ fillColor:[111,66,193], textColor:255, fontStyle:'bold' },
+                        styles:{ fontSize:9, cellPadding:2 }
+                    });
+                } else {
+                    const fromEl = document.getElementById("fromDate");
+                    const toEl   = document.getElementById("toDate");
+                    const from   = fromEl ? fromEl.value : "";
+                    const to     = toEl   ? toEl.value   : "";
+                    filename = `Attendance_Report_${department.replace(/\s+/g,'_')}_${program}_Year_${year}_${from}_to_${to}.pdf`;
+                    title    = 'DETAILED ATTENDANCE REPORT';
+                    subtitle = `${department} - ${program} ${year}${sfx} Year (${classLabel})`;
+                    doc.setFontSize(16); doc.setFont(undefined,'bold');
+                    doc.text(title, 105, 43, { align: 'center' });
+                    doc.setFontSize(11); doc.setFont(undefined,'normal');
+                    doc.text(subtitle, 105, 50, { align: 'center' });
+                    doc.text(`Period: ${from} to ${to}`, 105, 57, { align: 'center' });
+                    doc.text(`Total Students: ${tableData.length}`, 105, 64, { align: 'center' });
+                    doc.autoTable({ startY:72, head:[headers], body:tableData, theme:'grid',
+                        headStyles:{ fillColor:[0,123,255], textColor:255, fontStyle:'bold' },
+                        styles:{ fontSize:8, cellPadding:2 },
+                        columnStyles:{ 2:{ cellWidth:40 }, 7:{ fontStyle:'bold' } },
+                        didParseCell(data) {
+                            if (data.column.index === 7 && data.section === 'body') {
+                                const pct = parseInt((data.cell.raw || '').replace('%',''));
+                                if (!isNaN(pct)) {
+                                    data.cell.styles.textColor = pct >= 75 ? [0,128,0] : pct >= 50 ? [255,165,0] : [220,0,0];
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Footer on every page
+                const pageCount  = doc.internal.getNumberOfPages();
+                const pageHeight = doc.internal.pageSize.height;
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8); doc.setFont(undefined,'normal');
+                    doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${i} of ${pageCount}`, 14, pageHeight - 10);
+                }
+
+                doc.save(filename);
+                showMessage(`✅ PDF downloaded successfully!`, "success");
+            } catch (err) {
+                console.error("PDF export error:", err);
+                alert("Failed to download PDF: " + err.message);
+            }
+        }
+
+        /* ── Delete whole class (admin only) ──────────────────────────── */
+        async function deleteClassData() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert("Only Admin can delete class data.");
+                return;
+            }
+            const deptEl = document.getElementById("reportDepartment");
+            const yearEl = document.getElementById("reportYear");
+            const dept   = deptEl ? deptEl.value.trim() : "";
+            const yr     = yearEl ? yearEl.value.trim() : "";
+            if (!dept || !yr) { alert("Select Department and Year first."); return; }
+
+            if (!confirm(`⚠️ Permanently delete all students and attendance for ${dept} Year ${yr}?`)) return;
+            if (!confirm(`FINAL CONFIRMATION: Delete ${dept} Year ${yr}?`)) return;
+
+            const res = await apiFetch('/reports/class', { method:'DELETE', body:{ department:dept, year:yr } });
+            if (res.ok) {
+                alert(`✅ ${res.message}`);
+                document.getElementById("reportBody").innerHTML = "";
+                hideElement("reportTable");
+                hideElement("reportSummary");
+                clearMessage();
+            } else {
+                alert(`❌ Delete failed: ${res.message}`);
+            }
+        }
+
+        /* ── Back button ──────────────────────────────────────────────── */
+        function goBack() {
+            if (currentUser && currentUser.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'home.html';
+            }
+        }
+
+        // Boot
+        document.addEventListener("DOMContentLoaded", initDetailedReport);
+    </script>
+    </main>
+</body>
+</html>
