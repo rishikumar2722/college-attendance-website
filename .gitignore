@@ -26,3 +26,6 @@ Thumbs.db
 .vscode/
 .idea/
 
+backend/node_modules/
+backend/.env
+backend/*.log
