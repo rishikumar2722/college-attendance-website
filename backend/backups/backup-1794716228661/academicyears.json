@@ -1,0 +1,40 @@
+[
+  {
+    "_id": "6af347772cc5bb3915b688f3",
+    "key": "global",
+    "__v": 0,
+    "admissionBatches": [
+      {
+        "batchId": "2024-2027",
+        "label": "2024–2027",
+        "startYear": 2024,
+        "endYear": 2027,
+        "active": true
+      },
+      {
+        "batchId": "2025-2028",
+        "label": "2025–2028",
+        "startYear": 2025,
+        "endYear": 2028,
+        "active": true
+      },
+      {
+        "batchId": "2026-2029",
+        "label": "2026–2029",
+        "startYear": 2026,
+        "endYear": 2029,
+        "active": true
+      }
+    ],
+    "createdAt": "2026-11-10T16:33:57.609Z",
+    "currentSession": {
+      "startYear": null,
+      "endYear": null,
+      "label": "",
+      "setAt": null,
+      "setBy": ""
+    },
+    "sessionHistory": [],
+    "updatedAt": "2026-11-10T16:34:29.042Z"
+  }
+]

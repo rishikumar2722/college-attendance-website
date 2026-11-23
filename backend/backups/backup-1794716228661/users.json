@@ -1,0 +1,72 @@
+[
+  {
+    "_id": "6af34849259344c6dab16c7b",
+    "name": "System Administrator",
+    "username": "admin",
+    "email": "vickysenthil678@gmail.com",
+    "password": "$2b$10$SPztgMjRRM1G7NM/iu0/zuRZ99C4oaMerjhoAoRjhVknsmCBJ3Ol2",
+    "role": "admin",
+    "department": "Administration",
+    "year": "All",
+    "status": "active",
+    "createdAt": "2026-11-10T16:37:29.944Z",
+    "updatedAt": "2026-11-10T16:37:29.944Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af3484a259344c6dab16c7e",
+    "name": "CS Staff",
+    "username": "cs",
+    "email": "vipersoul135@gmail.com",
+    "password": "$2b$10$hMPi84lryb2I6KKVVZbbzerv3qhEShgf4rmwH3mnlAXI7BBz5Id4q",
+    "role": "staff",
+    "department": "Computer Science",
+    "year": "All",
+    "status": "active",
+    "createdAt": "2026-11-10T16:37:30.223Z",
+    "updatedAt": "2026-11-10T16:37:30.223Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af3484a259344c6dab16c81",
+    "name": "CS Staff (Year 1)",
+    "username": "cs1",
+    "email": "vipersoul135@gmail.com",
+    "password": "$2b$10$4usQcBAPzwc6p.KJKszOnu0bCq1vZKgOMnLYwW/.wa3gSNP6a4pRC",
+    "role": "staff",
+    "department": "Computer Science",
+    "year": "1",
+    "status": "active",
+    "createdAt": "2026-11-10T16:37:30.408Z",
+    "updatedAt": "2026-11-10T16:37:30.408Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af3484a259344c6dab16c84",
+    "name": "CS Staff (Year 2)",
+    "username": "cs2",
+    "email": "vipersoul135@gmail.com",
+    "password": "$2b$10$qia.b9WlN93obYhM4AnZke3kyq9mBQU2zdEHJbIYIWOjL2f5mp73K",
+    "role": "staff",
+    "department": "Computer Science",
+    "year": "2",
+    "status": "active",
+    "createdAt": "2026-11-10T16:37:30.604Z",
+    "updatedAt": "2026-11-10T16:37:30.604Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af3484a259344c6dab16c87",
+    "name": "CS Staff (Year 3)",
+    "username": "cs3",
+    "email": "vipersoul135@gmail.com",
+    "password": "$2b$10$SAwpuan/vtIzvlxreH04guWGXhlc1gAnSJVdrokj1qeYHCsi6Z9N6",
+    "role": "staff",
+    "department": "Computer Science",
+    "year": "3",
+    "status": "active",
+    "createdAt": "2026-11-10T16:37:30.782Z",
+    "updatedAt": "2026-11-10T16:37:30.782Z",
+    "__v": 0
+  }
+]
