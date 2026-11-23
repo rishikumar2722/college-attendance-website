@@ -23,6 +23,28 @@ backend/server.log
 # OS & Editor files
 .DS_Store
 Thumbs.db
+
+node_modules
+**/node_modules
+
+.git
+.gitignore
+
+.env
+.env.*
+!.env.example
+
+npm-debug.log
+*.log
+
+coverage
+.nyc_output
+
+.DS_Store
+Thumbs.db
+
+Jenkinsfile
+README.md
 .vscode/
 .idea/
 
