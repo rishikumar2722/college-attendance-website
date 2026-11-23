@@ -1,0 +1,49 @@
+services:
+  attendance-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: attendance-app
+
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: mongodb://mongodb:27017/attendance
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+    networks:
+      - attendance-network
+
+  mongodb:
+    image: mongo:8
+    container_name: attendance-mongodb
+
+    restart: unless-stopped
+
+    volumes:
+      - mongodb-data:/data/db
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - attendance-network
+
+volumes:
+  mongodb-data:
+
+networks:
+  attendance-network:
+    driver: bridge
