@@ -7,7 +7,7 @@ let currentUser = null;
 let currentReportData = null;
 let selectedDate = null;
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 /**
  * Check authentication and load user info

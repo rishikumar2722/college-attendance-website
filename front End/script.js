@@ -4,7 +4,7 @@
    Authentication and assigned class scope are validated by the backend.
    ========================================================================== */
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:3000/api';
 
 // Initial default students for Computer Science Year 3 (cs3's class)
 const DEFAULT_CS3_STUDENTS = [

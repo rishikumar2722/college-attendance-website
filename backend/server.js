@@ -1,15 +1,16 @@
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const path = require('path');
+const mongoose = require('mongoose');
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
+// Database configuration
 const connectDB = require('./config/db');
 
-// Existing route imports
+// Route imports
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
@@ -18,51 +19,62 @@ const studentRequestRoutes = require('./routes/studentRequestRoutes');
 const parentNotificationRoutes = require('./routes/parentNotificationRoutes');
 const staffMessageRoutes = require('./routes/staffMessageRoutes');
 
+// Express application
 const app = express();
+
+// Server configuration
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0';
+const DB_RETRY_DELAY_MS = 5000;
+
+// Trust proxy configuration
 app.set('trust proxy', process.env.TRUST_PROXY === '1' ? 1 : false);
 
 // Security middleware
 app.use(helmet());
 
 // CORS configuration
-const allowedOrigins = (process.env.FRONTEND_ORIGIN || 'http://localhost:5500')
+const allowedOrigins = (
+    process.env.FRONTEND_ORIGIN || 'http://localhost:5500'
+)
     .split(',')
-    .map(origin => origin.trim());
+    .map(origin => origin.trim())
+    .filter(Boolean);
 
 app.use(
     cors({
         origin: (origin, callback) => {
-            // Allow requests with no Origin header (curl, Postman, health checks)
-            // or when opening HTML files directly from disk (file://) in development.
+            // Allow requests without an Origin header
             if (!origin) {
                 return callback(null, true);
             }
 
+            // Allow configured frontend origins
             if (allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
 
-            // In development, log the blocked origin to help diagnose mismatches.
             if (process.env.NODE_ENV !== 'production') {
-                console.warn(`CORS blocked origin: "${origin}". Add it to FRONTEND_ORIGIN in .env`);
+                console.warn(`CORS blocked origin: ${origin}`);
             }
 
             return callback(new Error('Origin not allowed by CORS'));
         },
+
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+
         allowedHeaders: ['Content-Type', 'Authorization'],
+
         credentials: true
     })
 );
 
-// Body parsing
+// Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-    const mongoose = require('mongoose');
-
     const connected = mongoose.connection.readyState === 1;
 
     res.status(connected ? 200 : 503).json({
@@ -73,7 +85,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Existing API routes
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/attendance', attendanceRoutes);
@@ -84,7 +96,7 @@ app.use('/api/student-requests', studentRequestRoutes);
 app.use('/api/student-registration-requests', studentRequestRoutes);
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((req, res) => {
     res.status(404).json({
         success: false,
         message: `Endpoint ${req.originalUrl} not found`
@@ -100,73 +112,102 @@ app.use((err, req, res, next) => {
     res.status(statusCode).json({
         success: false,
         message: err.message || 'Internal Server Error',
+
         stack: process.env.NODE_ENV === 'production'
             ? undefined
             : err.stack
     });
 });
 
-// Connect database first, then start server
-const PORT = process.env.PORT || 5000;
-const DB_RETRY_DELAY_MS = 5000;
-
-process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err.message);
-    process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    process.exit(1);
-});
-
-async function startServer() {
-    app.listen(PORT, () => {
-        console.log(`Attendance Backend running on port ${PORT}`);
-        console.log(`API Base: http://localhost:${PORT}/api`);
-        console.log(`Health Check: http://localhost:${PORT}/api/health`);
-        console.log(`Allowed CORS Origins: ${allowedOrigins.join(', ')}`);
-        console.log('');
-        console.log(`Environment: ${process.env.NODE_ENV}`);
-    });
-
-    try {
-        await connectDB();
-    } catch (error) {
-        console.error('');
-        console.error('===========================================');
-        console.error('MongoDB connection failed');
-        console.error('===========================================');
-        console.error('');
-        console.error('The API is running, but database-backed requests will be unavailable until MongoDB connects.');
-        console.error('Check backend/.env MONGODB_URI and verify Atlas network access and credentials.');
-        retryDatabaseConnection();
-    }
-}
+// MongoDB reconnection mechanism
+let reconnectTimer = null;
 
 function retryDatabaseConnection() {
-    const retryTimer = setTimeout(async () => {
+    if (reconnectTimer) {
+        return;
+    }
+
+    reconnectTimer = setTimeout(async () => {
+        reconnectTimer = null;
+
         try {
+            console.log('Attempting MongoDB reconnection...');
+
             await connectDB();
+
             console.log('MongoDB reconnected successfully.');
+
         } catch (error) {
-            console.error(`MongoDB reconnection failed. Retrying in ${DB_RETRY_DELAY_MS / 1000} seconds.`);
+            console.error(
+                `MongoDB reconnection failed. Retrying in ${DB_RETRY_DELAY_MS / 1000} seconds.`
+            );
+
             retryDatabaseConnection();
         }
     }, DB_RETRY_DELAY_MS);
-
-    retryTimer.unref();
 }
 
+// Start application
+async function startServer() {
+    try {
+        // Start HTTP server only once
+        const server = app.listen(PORT, HOST, () => {
+            console.log('===========================================');
+            console.log('College Attendance Management System');
+            console.log('===========================================');
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`Server running on: http://${HOST}:${PORT}`);
+            console.log(`API Base URL: http://localhost:${PORT}/api`);
+            console.log(`Health Check: http://localhost:${PORT}/api/health`);
+            console.log(`Allowed CORS Origins: ${allowedOrigins.join(', ')}`);
+            console.log('===========================================');
+        });
+
+        server.on('error', (error) => {
+            console.error('HTTP Server Error:', error.message);
+            process.exit(1);
+        });
+
+        // Connect to MongoDB
+        try {
+            console.log('Connecting to MongoDB...');
+
+            await connectDB();
+
+            console.log('MongoDB connection established.');
+
+        } catch (error) {
+            console.error('===========================================');
+            console.error('MongoDB connection failed');
+            console.error('===========================================');
+            console.error(error.message);
+
+            console.error(
+                `Retrying database connection every ${DB_RETRY_DELAY_MS / 1000} seconds.`
+            );
+
+            // Keep API running while retrying MongoDB
+            retryDatabaseConnection();
+        }
+
+    } catch (error) {
+        console.error('Application startup failed:', error.message);
+        process.exit(1);
+    }
+}
+
+// Handle unexpected errors
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Promise Rejection:', reason);
+    process.exit(1);
+});
+
+// Start the application
 startServer();
-
-// Compatibility fallback: also listen on the legacy port 5000 (if free).
-const LEGACY_PORT = 5000;
-try {
-  app.listen(LEGACY_PORT, () => console.log(`Legacy listener active on port ${LEGACY_PORT}`));
-} catch (e) {
-  console.warn(`Legacy port ${LEGACY_PORT} unavailable – likely already in use.`);
-}
-
 
 module.exports = app;

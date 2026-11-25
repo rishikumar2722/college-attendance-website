@@ -294,7 +294,7 @@
 
         if (token) {
             try {
-                const BASE_URL = 'http://localhost:5000/api';
+                const BASE_URL = 'http://localhost:3000/api';
                 const response = await fetch(`${BASE_URL}/students/register`, {
                     method: "POST",
                     headers: {
@@ -405,7 +405,7 @@
             // Get current user info for backend upload
             const user = getCurrentUser();
             const token = localStorage.getItem("token");
-            const BASE_URL = 'http://localhost:5000/api';
+            const BASE_URL = 'http://localhost:3000/api';
 
             if (token) {
                 const formData = new FormData();

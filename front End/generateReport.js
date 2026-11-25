@@ -1,5 +1,5 @@
 // Function to generate the attendance report
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:3000/api';
 const token = localStorage.getItem("token");
 
 

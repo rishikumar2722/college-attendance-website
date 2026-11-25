@@ -2,7 +2,7 @@
    admin.js - JavaScript for admin.html
    ======================================================== */
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:3000/api';
 
 /**
  * Check if user is authenticated and has admin privileges.

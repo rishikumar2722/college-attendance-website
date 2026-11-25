@@ -2,7 +2,7 @@
    common.js - Shared utilities, API client & session management
    ========================================================================== */
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:3000/api';
 
 const departments = {
     cs: "Computer Science",

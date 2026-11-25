@@ -3,7 +3,7 @@
    ======================================================== */
 
 let currentUser = null;
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:3000/api';
 let students = [];
 let selectedDepartment = "";
 let selectedProgram = "UG";

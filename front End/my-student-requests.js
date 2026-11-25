@@ -2,7 +2,7 @@
    my-student-requests.js - Staff View My Requests Logic
    ========================================================================== */
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:3000/api';
 
 document.addEventListener("DOMContentLoaded", function() {
     const currentUser = getCurrentUser();

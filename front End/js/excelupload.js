@@ -3,7 +3,7 @@
    Supports: photo, email, phone, dateOfBirth, address, parentName, parentPhone
    ========================================================================== */
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:3000/api';
 
 document.addEventListener("DOMContentLoaded", () => {
     const uploadForm = document.getElementById("uploadForm");
